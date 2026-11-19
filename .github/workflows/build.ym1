@@ -1,0 +1,34 @@
+name: ODIN iOS Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build ODIN
+        run: |
+          xcodebuild \
+            -project ODIN.xcodeproj \
+            -scheme ODIN \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: ODIN-App
+          path: build/Build/Products/Release-iphoneos/ODIN.app
